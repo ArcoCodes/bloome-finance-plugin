@@ -4,7 +4,7 @@
 
 | Domain | Purpose | Decision |
 | --- | --- | --- |
-| `https://hongrongyuan.bloome.im` | Device authorization, entitlements, research gateway, run lifecycle, and report publishing | Keep. This replaces the temporary `*.edgespark.app` endpoint used by the source project. The new index must stay behind this gateway; do not expose an index host in the plugin. |
+| `https://finance.bloome.im` | Device authorization, entitlements, research gateway, run lifecycle, and report publishing | Keep. This replaces the temporary source-project endpoint. The new index must stay behind this gateway; do not expose an index host in the plugin. |
 | `https://fonts.googleapis.com` | Workbench font stylesheet | Keep unless offline or stricter privacy requirements justify bundling fonts. |
 | `https://fonts.gstatic.com` | Workbench font files | Keep with the Google Fonts stylesheet. |
 | Dynamic presigned upload host | Private report upload | Keep dynamic. Bloome Finance returns the URL and required headers at runtime. |

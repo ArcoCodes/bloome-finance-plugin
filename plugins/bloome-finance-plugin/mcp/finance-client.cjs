@@ -6,7 +6,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { spawn } = require("node:child_process");
 
-const DEFAULT_FINANCE_URL = "https://hongrongyuan.bloome.im";
+const DEFAULT_FINANCE_URL = "https://finance.bloome.im";
 const DEFAULT_CREDENTIAL_FILE = path.join(os.homedir(), ".bloome", "finance-credential.json");
 const RUN_FILE = ".bloome-finance-run.json";
 const opaqueTokenPattern = /^[A-Za-z0-9_-]{43}$/;

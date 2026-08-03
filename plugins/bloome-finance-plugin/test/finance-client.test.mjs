@@ -15,6 +15,10 @@ function json(payload, status = 200) {
   });
 }
 
+test("production requests use the Bloome Finance domain", () => {
+  assert.equal(finance.DEFAULT_FINANCE_URL, "https://finance.bloome.im");
+});
+
 test("first protected request completes device authorization and stores only the access token locally", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "bloome-finance-auth-"));
   const credentialFile = path.join(root, "credential.json");
