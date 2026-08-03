@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bloome.dev/schemas/plugin-config.schema.json",
+  "title": "Bloome cross-runtime plugin configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "name",
+    "version",
+    "displayName",
+    "marketplace",
+    "description",
+    "author",
+    "repository",
+    "keywords",
+    "components",
+    "codex"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "name": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$" },
+    "displayName": { "type": "string", "minLength": 1 },
+    "marketplace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "displayName", "category"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "displayName": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 }
+      }
+    },
+    "description": { "type": "string", "minLength": 1 },
+    "author": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "url"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "repository": { "type": "string", "format": "uri" },
+    "keywords": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skills", "mcpServers"],
+      "properties": {
+        "skills": { "type": "string", "pattern": "^\\./" },
+        "mcpServers": { "const": "./.mcp.json" }
+      }
+    },
+    "codex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shortDescription", "longDescription", "capabilities", "defaultPrompt", "brandColor", "composerIcon", "logo", "logoDark", "screenshots"],
+      "properties": {
+        "shortDescription": { "type": "string", "minLength": 1 },
+        "longDescription": { "type": "string", "minLength": 1 },
+        "capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "defaultPrompt": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "maxLength": 128 } },
+        "brandColor": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "composerIcon": { "type": "string", "pattern": "^\\./assets/" },
+        "logo": { "type": "string", "pattern": "^\\./assets/" },
+        "logoDark": { "type": "string", "pattern": "^\\./assets/" },
+        "screenshots": { "type": "array", "items": { "type": "string", "pattern": "^\\./assets/.+\\.png$" } }
+      }
+    }
+  }
+}

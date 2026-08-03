@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN" data-display-mode="inline">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bloome Investment Research</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,400;8..144,500;8..144,600&family=Sora:wght@100;300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue:#2556b6; --black:#0e0807; --cream:#f8f6f3; --white:#fff; --orange:#f36440;
+      --ink70:rgba(14,8,7,.70); --ink45:rgba(14,8,7,.45); --ink20:rgba(14,8,7,.20); --ink08:rgba(14,8,7,.08);
+      --chalk:rgba(255,255,255,.96); --chalk74:rgba(255,255,255,.74); --chalk62:rgba(255,255,255,.62); --chalk52:rgba(255,255,255,.52); --chalk10:rgba(255,255,255,.10);
+      --display:"Sora",-apple-system,BlinkMacSystemFont,sans-serif;
+      --meta:"Roboto Flex",-apple-system,BlinkMacSystemFont,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;background:var(--white);color:var(--black);font-family:var(--display)}
+    button{font:inherit}
+    .launcher{display:none;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:20px;min-height:112px;padding:18px 24px;border-top:4px solid var(--blue);border-bottom:1px solid var(--ink08);background:var(--white)}
+    .launcher-brand{display:flex;align-items:center;gap:12px}.launcher-brand img{width:64px;height:24px;object-fit:contain}.launcher-brand span{color:var(--ink45);font:500 10px/1.2 var(--meta);letter-spacing:.12em;text-transform:uppercase}
+    .launcher-copy{min-width:0}.launcher-topic{margin:0 0 8px;overflow:hidden;font-size:15px;font-weight:500;text-overflow:ellipsis;white-space:nowrap}.launcher-meta{display:flex;align-items:center;gap:12px;color:var(--ink45);font:500 10px/1 var(--meta);letter-spacing:.08em;text-transform:uppercase}.launcher-track{width:min(180px,22vw);height:1px;background:var(--ink20)}.launcher-track span{display:block;width:var(--p);height:1px;background:var(--orange)}
+    html[data-display-mode="inline"],html[data-display-mode="inline"] body{height:auto;min-height:0}html[data-display-mode="inline"] .launcher{display:grid}html[data-display-mode="inline"] .app{display:none}
+    .app{height:100vh;min-height:560px;display:grid;grid-template-rows:76px minmax(0,1fr);overflow:hidden;background:var(--white)}
+    .topbar{display:grid;grid-template-columns:220px minmax(0,1fr) auto;align-items:center;padding:0 24px;border-top:4px solid var(--blue);border-bottom:1px solid var(--ink08);background:var(--white)}
+    .brand{display:flex;align-items:center;gap:16px;min-width:0}.brand img{width:64px;height:24px;object-fit:contain;flex:none}.brand span{font-size:14px;font-weight:500}
+    .project{overflow:hidden;text-align:center;text-overflow:ellipsis;white-space:nowrap;font-size:16px}.project strong{font-weight:600}
+    .top-actions{display:flex;align-items:center;gap:16px}.status{display:flex;align-items:center;gap:8px;font:500 11px/1 var(--meta);letter-spacing:.09em;text-transform:uppercase}.status-dot{width:7px;height:7px;border-radius:9999px;background:var(--orange)}
+    .pill{min-height:40px;padding:0 18px;border:1px solid currentColor;border-radius:9999px;background:transparent;color:inherit;cursor:pointer;font-size:13px}.pill:focus-visible,.nav button:focus-visible,.tab:focus-visible{outline:2px solid var(--orange);outline-offset:3px}.pill.solid{border-color:var(--black);background:var(--black);color:var(--white)}
+    .workspace{min-height:0;display:grid;grid-template-columns:220px minmax(420px,1fr) 330px}
+    .sidebar,.ledger{min-height:0;background:var(--white);color:var(--black)}
+    .sidebar{display:flex;flex-direction:column;padding:32px 24px 24px;border-right:1px solid var(--ink08)}
+    .eyebrow{margin:0;font:500 10px/1.2 var(--meta);letter-spacing:.16em;text-transform:uppercase}.sidebar .eyebrow,.ledger .eyebrow{color:var(--ink45)}
+    .nav{margin:20px 0 30px;border-top:1px solid var(--ink08)}.nav button{width:100%;display:flex;align-items:center;justify-content:space-between;padding:15px 0;border:0;border-bottom:1px solid var(--ink08);background:none;color:var(--ink70);cursor:pointer;text-align:left;font-size:13px}.nav button.active{color:var(--black)}.nav button.active::after{content:"";width:18px;height:1px;background:var(--orange)}
+    .stages{margin-top:12px}.stage{position:relative;display:grid;grid-template-columns:28px 1fr 14px;align-items:center;min-height:50px;border-bottom:1px solid var(--ink08);color:var(--ink45);font:400 12px/1.2 var(--meta)}.stage.done{color:var(--ink70)}.stage.current{color:var(--black)}.stage.current::before{content:"";position:absolute;left:-24px;top:0;bottom:0;width:3px;background:var(--blue)}.mark{width:6px;height:6px;border:1px solid currentColor;border-radius:9999px;justify-self:end}.done .mark{background:currentColor}.current .mark{border-color:var(--orange);background:var(--orange)}
+    .sidebar-foot{margin-top:auto;color:var(--ink45);font:400 10px/1.6 var(--meta)}.sidebar-foot strong{color:var(--ink70);font-weight:500}.workspace-path{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .canvas{min-width:0;min-height:0;overflow:auto;padding:44px clamp(32px,4.6vw,68px) 36px;background:var(--white)}
+    .view{display:none}.view.active{display:block}.canvas-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding-bottom:24px;border-bottom:1px solid var(--ink20)}.canvas-head h1{max-width:760px;margin:0;font-size:clamp(42px,4.5vw,68px);line-height:1;letter-spacing:-.055em}.medium{font-weight:500}.thin{display:block;font-weight:100}.canvas-head .eyebrow{color:var(--ink45);white-space:nowrap}
+    .judgment{padding:30px 0;border-bottom:1px solid var(--ink08)}.judgment .eyebrow{margin-bottom:12px;color:var(--ink45)}.judgment-copy{max-width:820px;margin:0;font-size:19px;line-height:1.65;letter-spacing:-.02em}
+    .section{padding-top:28px}.section-title{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}.section-title h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.03em}.section-title span{color:var(--ink45);font:500 10px/1.2 var(--meta);letter-spacing:.12em;text-transform:uppercase}
+    .module,.artifact-row{display:grid;grid-template-columns:32px minmax(120px,1fr) minmax(150px,2fr) 42px;gap:14px;align-items:center;min-height:60px;border-top:1px solid var(--ink08)}.module:last-child,.artifact-row:last-child{border-bottom:1px solid var(--ink08)}.module-num,.module-status,.artifact-size{color:var(--ink45);font:500 11px/1 var(--meta)}.module-name,.artifact-name{font-size:13px}.module-scope{overflow:hidden;color:var(--ink70);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.track{height:1px;background:var(--ink20);position:relative}.track span{position:absolute;inset:0 auto 0 0;width:var(--p);background:var(--black)}
+    .coverage{display:grid;grid-template-columns:repeat(4,1fr);margin-top:28px;border-top:1px solid var(--ink20);border-bottom:1px solid var(--ink20)}.coverage-item{padding:16px 12px 16px 0;border-right:1px solid var(--ink08)}.coverage-item+.coverage-item{padding-left:12px}.coverage-item:last-child{border-right:0}.coverage-item strong{display:block;margin-bottom:4px;font-size:18px;font-weight:500}.coverage-item span{color:var(--ink45);font:500 9px/1.3 var(--meta);letter-spacing:.09em;text-transform:uppercase}
+    .empty{padding:48px 0;border-top:1px solid var(--ink08);color:var(--ink45);font-size:14px;line-height:1.7}
+    .report-frame{width:100%;height:calc(100vh - 158px);min-height:560px;border:1px solid var(--ink20);background:var(--white)}.report-note{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;color:var(--ink70);font-size:12px}.report-note strong{color:var(--black);font-weight:500}
+    .ledger{display:flex;flex-direction:column;padding:36px 26px 24px;border-left:1px solid var(--ink08);overflow:hidden}.ledger h2{margin:8px 0 20px;color:var(--black);font-size:28px;line-height:1.15;font-weight:500}.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--ink08)}.tab{position:relative;padding:0 0 13px;border:0;background:none;color:var(--ink45);cursor:pointer;text-align:left;font:500 10px/1.2 var(--meta);letter-spacing:.1em;text-transform:uppercase}.tab.active{color:var(--black)}.tab.active::after{content:"";position:absolute;right:0;bottom:-1px;left:0;height:2px;background:var(--orange)}
+    .evidence-list{min-height:0;overflow:auto}.evidence-card{padding:20px 0;border-bottom:1px solid var(--ink08)}.evidence-meta{color:var(--ink45);font:500 9px/1.4 var(--meta);letter-spacing:.1em;text-transform:uppercase}.evidence-card h3{margin:8px 0;color:var(--black);font-size:15px;line-height:1.4;font-weight:500}.evidence-card blockquote{margin:0;color:var(--ink70);font:400 13px/1.7 var(--meta)}.source{margin-top:12px;color:var(--ink45);font:400 10px/1.5 var(--meta)}.ledger-actions{display:flex;gap:10px;margin-top:auto;padding-top:18px}.ledger .pill{border-color:var(--ink20);color:var(--black);min-height:40px}
+    .toast{position:fixed;right:18px;bottom:18px;padding:11px 16px;border-radius:9999px;background:var(--orange);color:var(--black);font:500 11px/1 var(--meta);opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:none}
+    @media(max-width:1180px){.workspace{grid-template-columns:200px minmax(0,1fr)}.topbar{grid-template-columns:200px minmax(0,1fr) auto}.ledger{display:none}.sidebar{padding-right:20px;padding-left:20px}.stage.current::before{left:-20px}.canvas{padding-right:clamp(28px,5vw,56px);padding-left:clamp(28px,5vw,56px)}}
+    @media(max-width:760px){
+      .launcher{grid-template-columns:minmax(0,1fr) auto;gap:14px;min-height:104px;padding:16px}.launcher-brand{display:none}.launcher-track{width:min(110px,24vw)}
+      .app{min-height:480px;grid-template-rows:64px minmax(0,1fr)}
+      .topbar{grid-template-columns:auto minmax(0,1fr) auto;padding:0 16px}.brand{gap:0}.brand span,.status{display:none}.project{padding:0 12px;text-align:left;font-size:13px}.pill{min-height:36px;padding:0 14px;font-size:12px}
+      .workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:49px minmax(0,1fr)}
+      .sidebar{display:block;padding:0 12px;border-right:0;border-bottom:1px solid var(--ink08)}.sidebar>.eyebrow,.sidebar>.stages,.sidebar>.sidebar-foot{display:none}
+      .nav{display:grid;grid-template-columns:repeat(4,1fr);height:49px;margin:0;border:0}.nav button{position:relative;justify-content:center;padding:0 4px;border:0;color:var(--ink45);font-size:11px;white-space:nowrap}.nav button.active::after{position:absolute;right:8px;bottom:0;left:8px;width:auto;height:2px}
+      .canvas{padding:28px 20px 24px}.canvas-head{align-items:flex-start;gap:12px;padding-bottom:20px}.canvas-head h1{font-size:clamp(34px,10.5vw,48px);letter-spacing:-.045em}.canvas-head .eyebrow{display:none}.judgment{padding:24px 0}.judgment-copy{font-size:16px;line-height:1.65}.section{padding-top:24px}.section-title h2{font-size:19px}
+      .module,.artifact-row{grid-template-columns:28px minmax(0,1fr) auto;gap:10px;min-height:56px}.module-scope,.artifact-row .track{display:none}.module-name,.artifact-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .coverage{grid-template-columns:repeat(2,1fr);margin-top:24px}.coverage-item:nth-child(2){border-right:0}.coverage-item:nth-child(-n+2){border-bottom:1px solid var(--ink08)}
+      .report-note{align-items:flex-start;gap:12px;font-size:10px;line-height:1.5}.report-note>span:last-child{white-space:nowrap}.report-frame{height:calc(100vh - 185px);min-height:300px}
+    }
+  </style>
+</head>
+<body>
+  <section class="launcher" aria-label="Open Bloome Research panel">
+    <div class="launcher-brand"><img src="{{BLOOME_WORDMARK}}" alt="Bloome"><span>Research</span></div>
+    <div class="launcher-copy">
+      <p class="launcher-topic" id="launcherTopic">Investment research</p>
+      <div class="launcher-meta"><span id="launcherStatus">Planning · 0%</span><span class="launcher-track" aria-hidden="true"><span id="launcherProgress" style="--p:0%"></span></span></div>
+    </div>
+    <button class="pill solid" id="openPanelBtn">Open panel</button>
+  </section>
+  <main class="app" aria-label="Bloome Investment Research workbench">
+    <header class="topbar">
+      <div class="brand"><img src="{{BLOOME_WORDMARK}}" alt="Bloome"><span>Research</span></div>
+      <div class="project"><strong id="projectTopic">Investment research</strong></div>
+      <div class="top-actions"><div class="status"><span class="status-dot"></span><span id="statusText">Planning · 0%</span></div><button class="pill" id="expandBtn">Expand</button><button class="pill solid" id="exportBtn">Export</button></div>
+    </header>
+    <section class="workspace">
+      <aside class="sidebar">
+        <p class="eyebrow">Workspace</p>
+        <nav class="nav" aria-label="Research views">
+          <button class="active" data-view="thesis">Thesis</button>
+          <button data-view="map">Research map</button>
+          <button data-view="evidence">Evidence</button>
+          <button data-view="report">Report</button>
+        </nav>
+        <p class="eyebrow">Research flow</p>
+        <div class="stages" id="stages"></div>
+        <div class="sidebar-foot"><strong>Codex Native</strong><br>Local workspace · Bloome Finance<span class="workspace-path" id="workspacePath"></span></div>
+      </aside>
+
+      <article class="canvas">
+        <section class="view active" data-panel="thesis">
+          <header class="canvas-head"><h1><span class="medium">Evidence before</span><span class="thin">conviction.</span></h1><p class="eyebrow">Core thesis</p></header>
+          <div class="judgment"><p class="eyebrow">Current judgment</p><p class="judgment-copy" id="judgment"></p></div>
+          <div class="section"><div class="section-title"><h2>Research modules</h2><span id="moduleCount"></span></div><div id="modules"></div></div>
+          <div class="coverage" id="coverage"></div>
+        </section>
+
+        <section class="view" data-panel="map">
+          <header class="canvas-head"><h1><span class="medium">Staged work.</span><span class="thin">One evidence spine.</span></h1><p class="eyebrow">Research map</p></header>
+          <div class="section"><div class="section-title"><h2>Required artifacts</h2><span id="artifactCount"></span></div><div id="artifacts"></div></div>
+        </section>
+
+        <section class="view" data-panel="evidence">
+          <header class="canvas-head"><h1><span class="medium">Claims stay</span><span class="thin">traceable.</span></h1><p class="eyebrow">Evidence</p></header>
+          <div class="section"><div class="section-title"><h2>Evidence backbone</h2><span id="evidenceCount"></span></div><div id="evidenceTable"></div></div>
+        </section>
+
+        <section class="view" data-panel="report">
+          <div class="report-note"><span><strong>Native investment report</strong> · The plugin shell does not restyle this document.</span><span id="reportState"></span></div>
+          <iframe class="report-frame" id="reportFrame" title="Investment report preview" sandbox="allow-scripts"></iframe>
+        </section>
+      </article>
+
+      <aside class="ledger">
+        <p class="eyebrow">Evidence ledger</p><h2>Where the thesis<br>can break.</h2>
+        <div class="tabs" role="tablist"><button class="tab" data-tab="support" role="tab">Support · <span id="supportCount">0</span></button><button class="tab active" data-tab="challenge" role="tab">Challenge · <span id="challengeCount">0</span></button></div>
+        <div class="evidence-list" id="ledgerList"></div>
+        <div class="ledger-actions"><button class="pill" id="sourceBtn">Open source</button><button class="pill" id="refreshBtn">Refresh</button></div>
+      </aside>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STAGES = ["Scope", "Plan", "Research", "Validate", "Compose"];
+    const emptyData = { topic:"Investment research", status:"planning", progress:0, stage:1, judgment:"等待形成可验证的核心判断。", modules:[], artifacts:[], evidence:[], coverage:{}, reportHtml:"", workspace:"" };
+    let data = emptyData;
+    let evidenceTab = "challenge";
+    let displayMode = "inline";
+    const $ = (selector) => document.querySelector(selector);
+    const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);
+    function flash(message){const toast=$("#toast");toast.textContent=message;toast.classList.add("show");clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>toast.classList.remove("show"),1500)}
+    function evidenceSource(item){return [item.title,item.published_at,item.page_start?`p.${item.page_start}`:item.line_start?`lines ${item.line_start}${item.line_end?`–${item.line_end}`:""}`:""].filter(Boolean).join(" · ")}
+    function renderStages(){ $("#stages").innerHTML=STAGES.map((name,index)=>{const number=index+1;const state=number<data.stage?"done":number===data.stage?"current":"";return `<div class="stage ${state}"><span>0${number}</span><span>${name}</span><i class="mark"></i></div>`}).join("") }
+    function renderModules(){const modules=data.modules.length?data.modules:[{id:"01",question:"等待研究计划",scope:"计划确认后显示并行研究模块"}];$("#moduleCount").textContent=`${data.modules.length} active`;$("#modules").innerHTML=modules.map((item,index)=>`<div class="module"><span class="module-num">${esc(item.id||String(index+1).padStart(2,"0"))}</span><span class="module-name">${esc(item.question||item.name)}</span><span class="module-scope">${esc(item.scope||"")}</span><span class="module-status">${data.modules.length?"ACTIVE":"WAIT"}</span></div>`).join("")}
+    function renderCoverage(){const coverage=data.coverage||{};const cells=[[coverage.primary_sources_read||0,"Expert read"],[coverage.sell_reports_read||0,"Research read"],[data.evidence.length,"Evidence"],[`${data.progress||0}%`,"Complete"]];$("#coverage").innerHTML=cells.map(([value,label])=>`<div class="coverage-item"><strong>${esc(value)}</strong><span>${label}</span></div>`).join("")}
+    function renderArtifacts(){const rows=data.artifacts.length?data.artifacts:[];$("#artifactCount").textContent=`${rows.length} saved`;$("#artifacts").innerHTML=rows.length?rows.map((item,index)=>`<div class="artifact-row"><span class="module-num">${String(index+1).padStart(2,"0")}</span><span class="artifact-name">${esc(item.name)}</span><div class="track" style="--p:100%"><span></span></div><span class="artifact-size">${Math.max(1,Math.round(item.bytes/1024))}k</span></div>`).join(""):`<div class="empty">研究开始后，研究框架、验证、提纲、章节、报告和证据台账会依次出现在这里。</div>`}
+    function renderEvidenceTable(){const rows=data.evidence||[];$("#evidenceCount").textContent=`${rows.length} entries`;$("#evidenceTable").innerHTML=rows.length?rows.slice(0,30).map((item,index)=>`<div class="artifact-row"><span class="module-num">${String(index+1).padStart(2,"0")}</span><span class="artifact-name">${esc(item.claim)}</span><span class="module-scope">${esc(evidenceSource(item))}</span><span class="artifact-size">${esc(item.stance||"")}</span></div>`).join(""):`<div class="empty">所有重要判断、引文、表格和图表来源都必须回到 evidence.json。</div>`}
+    function renderLedger(){const support=data.evidence.filter(item=>item.stance==="support");const challenge=data.evidence.filter(item=>item.stance==="challenge");$("#supportCount").textContent=support.length;$("#challengeCount").textContent=challenge.length;const rows=evidenceTab==="support"?support:challenge;$("#ledgerList").innerHTML=rows.length?rows.slice(0,8).map(item=>`<article class="evidence-card"><div class="evidence-meta">${esc(item.chunk_id||item.report_id||item.stance)}</div><h3>${esc(item.claim)}</h3><blockquote>${esc(item.quote||"暂无引文")}</blockquote><div class="source">${esc(evidenceSource(item))}</div></article>`).join(""):`<div class="empty">暂无${evidenceTab==="support"?"支持":"反方"}证据。缺失本身也是需要处理的研究状态。</div>`}
+    function renderReport(){const frame=$("#reportFrame");$("#reportState").textContent=data.reportHtml?"report.html":"Not generated";frame.srcdoc=data.reportHtml||`<!doctype html><html><body style="margin:0;padding:64px;font-family:Georgia,serif;color:#1A1A1A"><h1 style="color:#003A5C">Report pending</h1><p style="line-height:1.7">完成验证和章节撰写后，原生 investment report 会显示在这里。</p></body></html>`}
+    function setDisplayMode(next){displayMode=["inline","pip","fullscreen"].includes(next)?next:"inline";document.documentElement.dataset.displayMode=displayMode;$("#expandBtn").textContent=displayMode==="fullscreen"?"Panel":"Expand";if(displayMode==="inline")window.openai?.notifyIntrinsicHeight?.(112)}
+    async function requestMode(mode){if(!window.openai?.requestDisplayMode){flash("Panel mode is unavailable in this host");return false}try{const result=await window.openai.requestDisplayMode({mode});setDisplayMode(result?.mode||mode);return true}catch{flash("Codex kept the current layout");return false}}
+    function render(next){data={...emptyData,...(next||{})};$("#projectTopic").textContent=data.topic;$("#launcherTopic").textContent=data.topic;$("#statusText").textContent=`${data.status} · ${data.progress}%`;$("#launcherStatus").textContent=`${data.status} · ${data.progress}%`;$("#launcherProgress").style.setProperty("--p",`${data.progress||0}%`);$("#workspacePath").textContent=data.workspace?`\n${data.workspace}`:"";$("#judgment").textContent=data.judgment;renderStages();renderModules();renderCoverage();renderArtifacts();renderEvidenceTable();renderLedger();renderReport()}
+    function selectView(name){document.querySelectorAll(".nav button").forEach(button=>button.classList.toggle("active",button.dataset.view===name));document.querySelectorAll(".view").forEach(panel=>panel.classList.toggle("active",panel.dataset.panel===name));if(name==="report"&&displayMode==="pip")requestMode("fullscreen")}
+    document.querySelectorAll(".nav button").forEach(button=>button.addEventListener("click",()=>selectView(button.dataset.view)));
+    document.querySelectorAll(".tab").forEach(button=>button.addEventListener("click",()=>{evidenceTab=button.dataset.tab;document.querySelectorAll(".tab").forEach(tab=>tab.classList.toggle("active",tab===button));renderLedger()}));
+    $("#exportBtn").addEventListener("click",async()=>{const value=data.workspace||"Research workspace";try{await navigator.clipboard.writeText(value);flash("Workspace path copied")}catch{flash("Report export is available from Codex")}});
+    $("#openPanelBtn").addEventListener("click",()=>requestMode("pip"));
+    $("#expandBtn").addEventListener("click",()=>requestMode(displayMode==="fullscreen"?"pip":"fullscreen"));
+    $("#sourceBtn").addEventListener("click",()=>flash("Ask Codex to open the selected evidence source"));
+    $("#refreshBtn").addEventListener("click",async()=>{if(window.openai?.callTool&&data.workspace){try{const result=await window.openai.callTool("open_research_workspace",{workspace:data.workspace});render(result?.structuredContent||result);flash("Workspace refreshed");return}catch{}}flash("Ask Codex to refresh this workspace")});
+    window.addEventListener("openai:set_globals",event=>{const globals=event.detail?.globals||{};const next=globals.toolOutput||globals.structuredContent;if(next)render(next);if(globals.displayMode)setDisplayMode(globals.displayMode)});
+    window.__bloomeRender=render;
+    setDisplayMode(window.openai?.displayMode||"inline");
+    render(window.__BLOOME_TEST_DATA__||window.openai?.toolOutput||window.openai?.structuredContent||emptyData);
+    if(!window.__BLOOME_DISABLE_AUTO_PANEL__&&displayMode==="inline"&&window.openai?.requestDisplayMode)setTimeout(()=>requestMode("pip"),0);
+  </script>
+</body>
+</html>

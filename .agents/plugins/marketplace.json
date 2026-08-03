@@ -1,0 +1,20 @@
+{
+  "name": "bloome-finance",
+  "interface": {
+    "displayName": "Bloome Finance"
+  },
+  "plugins": [
+    {
+      "name": "bloome-finance-plugin",
+      "source": {
+        "source": "local",
+        "path": "./plugins/bloome-finance-plugin"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Finance"
+    }
+  ]
+}

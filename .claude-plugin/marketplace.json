@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "bloome-finance",
+  "description": "Bloome plugins for evidence-first investment research.",
+  "owner": {
+    "name": "Bloome",
+    "url": "https://github.com/ArcoCodes"
+  },
+  "plugins": [
+    {
+      "name": "bloome-finance-plugin",
+      "source": "./plugins/bloome-finance-plugin",
+      "description": "Cross-runtime, evidence-first investment research with traceable sources and a Bloome workbench.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Bloome",
+        "url": "https://github.com/ArcoCodes"
+      },
+      "repository": "https://github.com/ArcoCodes/bloome-finance-plugin",
+      "keywords": [
+        "investment-research",
+        "finance",
+        "evidence"
+      ],
+      "category": "Finance"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "bloome-finance-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "generate:manifests": "node scripts/generate-runtime-manifests.mjs",
+    "check:manifests": "node scripts/generate-runtime-manifests.mjs --check",
+    "test": "node --test test/*.test.mjs",
+    "test:ui": "node test/ui.e2e.cjs",
+    "verify": "npm run check:manifests && npm test"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.0"
+  }
+}

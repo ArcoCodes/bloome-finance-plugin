@@ -1,0 +1,42 @@
+{
+  "name": "bloome-finance-plugin",
+  "version": "0.1.0",
+  "description": "Cross-runtime, evidence-first investment research with traceable sources and a Bloome workbench.",
+  "author": {
+    "name": "Bloome",
+    "url": "https://github.com/ArcoCodes"
+  },
+  "repository": "https://github.com/ArcoCodes/bloome-finance-plugin",
+  "keywords": [
+    "investment-research",
+    "finance",
+    "evidence"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Bloome Finance Research",
+    "shortDescription": "Evidence-first investment research in Codex",
+    "longDescription": "Run staged company, industry, theme, and thesis research with expert evidence prioritized over institutional reports, a traceable evidence ledger, and the investment skill's native report format. The Codex host also provides a Bloome workbench for progress, evidence, and report views.",
+    "developerName": "Bloome",
+    "category": "Finance",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "研究 AI 推理需求对 NAND 价格周期的影响，并生成完整研报。",
+      "打开当前项目的 Bloome Research 工作台。",
+      "验证当前研报是否满足全部输出要求。"
+    ],
+    "brandColor": "#2556B6",
+    "composerIcon": "./assets/logo-mark.svg",
+    "logo": "./assets/wordmark-black.svg",
+    "logoDark": "./assets/wordmark-white.svg",
+    "screenshots": [
+      "./assets/screenshot.png",
+      "./assets/screenshot-mobile.png"
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}
