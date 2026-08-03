@@ -23,7 +23,7 @@ test("cross-runtime skill keeps the original report template as source of truth"
   assert.match(skill, /Use `assets\/template\.html` as the visual source of truth/);
   assert.match(skill, /Do not replace it with a newly invented card layout/);
   assert.match(skill, /evidence\.json` as the unified evidence backbone/);
-  assert.match(skill, /Codex or Claude\/Cowork/);
+  assert.match(skill, /Codex, Claude\/Cowork.*WorkBuddy/);
   assert.match(skill, /host's existing account supplies the model/);
   assert.match(skill, /returned `reportPath`/);
   assert.match(skill, /reader-facing and single-page/);

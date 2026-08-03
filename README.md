@@ -1,8 +1,8 @@
 # Bloome Finance Plugin
 
-面向 Codex 与 Claude Code 的专家优先金融投研插件。它把可追溯的投研工作流、受控研究数据接口和统一报告契约打包成同一份共享实现，并为两个宿主生成各自的插件清单和 marketplace。专家与一手资料的判断权重高于机构研究报告。
+面向 Codex、Claude Code 与腾讯 WorkBuddy 的专家优先金融投研插件。它把可追溯的投研工作流、受控研究数据接口和统一报告契约打包成同一份共享实现，并为三个宿主生成各自的插件清单和 marketplace。专家与一手资料的判断权重高于机构研究报告。
 
-宿主使用用户现有账号完成规划、推理和写作，不需要额外的模型 API Key。Investment Research Skill 自带的研报结构、引用规则与 HTML 模板保持为最终输出标准。Codex 还会渲染 Bloome PiP / fullscreen 工作台；Claude Code 返回同一工作区的进度、证据和 `reportPath`，直接读取最终报告，不假装支持 Codex 专属面板。
+宿主使用用户现有账号完成规划、推理和写作，不需要额外的模型 API Key。Investment Research Skill 自带的研报结构、引用规则与 HTML 模板保持为最终输出标准。Codex 还会渲染 Bloome PiP / fullscreen 工作台；Claude Code 和 WorkBuddy 返回同一工作区的进度、证据和 `reportPath`，直接读取最终报告，不假装支持 Codex 专属面板。
 
 ## Codex 安装
 
@@ -31,9 +31,27 @@ claude --plugin-dir ./plugins/bloome-finance-plugin
 
 修改插件组件后，在 Claude Code 中执行 `/reload-plugins`。
 
+## WorkBuddy 安装
+
+在 WorkBuddy 对话中添加当前私有 marketplace（需先配置 GitHub 仓库访问权限），然后安装插件：
+
+```text
+/plugin marketplace add ArcoCodes/bloome-finance-plugin
+/plugin install bloome-finance-plugin@bloome-finance
+```
+
+本地开发可直接添加仓库中的 marketplace 文件：
+
+```text
+/plugin marketplace add /absolute/path/to/bloome-finance-plugin --name bloome-finance
+/plugin install bloome-finance-plugin@bloome-finance
+```
+
+安装或修改后执行 `/reload-plugins`，再新建任务。WorkBuddy 会加载同一套 Skills、Agents 和本地 MCP；完成报告通过返回的 `reportPath` 打开。
+
 ## 账号与研究额度
 
-模型推理继续使用 Codex 或 Claude 的现有账号，不需要额外模型 Key。首次调用研究工具时，本地 MCP 会打开 Bloome Finance：用户通过 Google 或邮箱登录并授权当前设备，完成后工具自动继续，不需要复制长期 token，也不会把 MCP 改成远程服务。
+模型推理继续使用 Codex、Claude 或 WorkBuddy 的现有账号，不需要额外模型 Key。首次调用研究工具时，本地 MCP 会打开 Bloome Finance：用户通过 Google 或邮箱登录并授权当前设备，完成后工具自动继续，不需要复制长期 token，也不会把 MCP 改成远程服务。
 
 每个完成验证的账号终身赠送 5 次研报额度。新 research workspace 的首次数据请求会先在对话中显示研究主题、费用和当前余额；用户明确确认后才开始检索。普通聊天、拒绝确认、创建或打开本地 workspace 都不扣费。同一 run 内后续搜索和精确读取不重复扣费，成功执行 `validate_research_workspace` 后关闭 run。额度不足时可前往 Bloome Finance 购买 20 篇、50 篇或包年无限篇套餐；包年有效期内单次费用为 0。
 
@@ -54,9 +72,11 @@ claude --plugin-dir ./plugins/bloome-finance-plugin
 ```text
 .agents/plugins/marketplace.json
 .claude-plugin/marketplace.json
+.workbuddy-plugin/marketplace.json
 plugins/bloome-finance-plugin/
 ├── .codex-plugin/plugin.json
 ├── .claude-plugin/plugin.json
+├── .workbuddy-plugin/plugin.json
 ├── .mcp.json
 ├── plugin.config.json
 ├── skills/investment-research/
@@ -79,6 +99,6 @@ Codex 清单还应使用 `plugin-creator` 的 `validate_plugin.py` 检查。架�
 
 ## 分发边界
 
-- 当前阶段：同一私有 GitHub 仓库同时作为 Codex 与 Claude Code marketplace，适用于小规模邀请制内测。
+- 当前阶段：同一私有 GitHub 仓库同时作为 Codex、Claude Code 与 WorkBuddy marketplace，适用于小规模邀请制内测。
 - 正式阶段：托管公网 MCP 服务、接入 Bloome 账号体系，并提交 Codex Plugins Directory 审核。
 - 插件只访问用户主动指定的研究工作区；报告文件保留在本地，并在验证成功后上传到用户私有的 Bloome Finance Storage。

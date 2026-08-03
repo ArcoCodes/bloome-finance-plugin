@@ -58,17 +58,19 @@ function widgetMeta(visibility = ["model", "app"]) {
 }
 
 function runtimeName(env = process.env) {
-  if (env.BLOOME_RUNTIME === "codex" || env.BLOOME_RUNTIME === "claude-code") return env.BLOOME_RUNTIME;
+  if (["codex", "claude-code", "workbuddy"].includes(env.BLOOME_RUNTIME)) return env.BLOOME_RUNTIME;
+  if (env.CODEBUDDY_PLUGIN_ROOT) return "workbuddy";
   return env.CLAUDE_PLUGIN_ROOT ? "claude-code" : "codex";
 }
 
 function runtimeProfile(runtime = runtimeName()) {
   const billing = "Treat confirmationRequired as a quote, not an error or quota block: show its topic, cost, and balance, ask the user to confirm, then call confirm_research_run only after explicit approval and retry the original retrieval with the same workspace.";
-  if (runtime === "claude-code") {
+  if (runtime !== "codex") {
+    const host = runtime === "workbuddy" ? "WorkBuddy" : "Claude Code";
     return {
       name: runtime,
       supportsWorkbench: false,
-      instructions: `Use Claude Code as the reasoning runtime. Preserve the investment research workflow and assets/template.html report contract. Use the returned reportPath to inspect the finished HTML report. ${billing}`,
+      instructions: `Use ${host} as the reasoning runtime. Preserve the investment research workflow and assets/template.html report contract. Use the returned reportPath to inspect the finished HTML report. ${billing}`,
     };
   }
   return {

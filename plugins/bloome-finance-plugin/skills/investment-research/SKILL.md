@@ -1,11 +1,11 @@
 ---
 name: investment-research-agent
-description: Runs long-form, expert-led investment research in Codex or Claude/Cowork through staged intermediate artifacts instead of one-shot output. Use for deep company, industry, theme, or thesis reports that prioritize expert and firsthand evidence, use institutional reports as supporting material, and produce traceable Markdown, HTML, and evidence deliverables.
+description: Runs long-form, expert-led investment research in Codex, Claude/Cowork, or WorkBuddy through staged intermediate artifacts instead of one-shot output. Use for deep company, industry, theme, or thesis reports that prioritize expert and firsthand evidence, use institutional reports as supporting material, and produce traceable Markdown, HTML, and evidence deliverables.
 ---
 
 # Investment Research Agent
 
-Use the active host—Codex or Claude/Cowork (including Claude Code plugin runtimes)—as the reasoning runtime and the bundled `research_search`, `research_get_chunk`, and `research_get_report_context` MCP tools as the corpus interface. The host's existing account supplies the model. On the first research call, Bloome Finance opens a browser for account sign-in and device authorization when needed. A new workspace's first retrieval returns a quote without charging; explicit confirmation starts its run and consumes one research credit, or zero credits during active annual unlimited access. All later retrieval using that same absolute workspace while the run is active is included.
+Use the active host—Codex, Claude/Cowork (including Claude Code plugin runtimes), or WorkBuddy—as the reasoning runtime and the bundled `research_search`, `research_get_chunk`, and `research_get_report_context` MCP tools as the corpus interface. The host's existing account supplies the model. On the first research call, Bloome Finance opens a browser for account sign-in and device authorization when needed. A new workspace's first retrieval returns a quote without charging; explicit confirmation starts its run and consumes one research credit, or zero credits during active annual unlimited access. All later retrieval using that same absolute workspace while the run is active is included.
 
 Do not write a long report in one pass. Keep `evidence.json` as the unified evidence backbone. MCP is the shared data plane only: it must never spawn an agent, invoke a model CLI, or call a model API.
 
@@ -15,7 +15,7 @@ Do not write a long report in one pass. Keep `evidence.json` as the unified evid
 2. Use the bundled research tools for retrieval and the active host for planning, validation, and synthesis.
 3. Save every required staged artifact in that workspace.
 4. Call `validate_research_workspace` before final delivery and repair every reported error.
-5. Call `open_research_workspace` with the absolute workspace path. In Codex, promote the compact launcher into the native PiP panel and use fullscreen for the report. In Claude Code, use the returned `reportPath` to inspect `report.html`; the same progress, evidence, artifact, and validation data remain available without a rendered MCP App panel. The workbench may frame the report where supported, but the report itself must keep `assets/template.html` unchanged as its visual source of truth.
+5. Call `open_research_workspace` with the absolute workspace path. In Codex, promote the compact launcher into the native PiP panel and use fullscreen for the report. In Claude Code or WorkBuddy, use the returned `reportPath` to inspect `report.html`; the same progress, evidence, artifact, and validation data remain available without a rendered MCP App panel. The workbench may frame the report where supported, but the report itself must keep `assets/template.html` unchanged as its visual source of truth.
 
 Useful starter requests:
 
@@ -44,10 +44,10 @@ The parent owns the landscape pass, module plan, evidence reconciliation, outlin
 
 After the landscape pass, save `plan.json` with enough non-overlapping modules to cover the topic deeply, using the fields defined in `references/module-contract.md`. Let the question determine module count. Prefer host-native delegation:
 
-- **Claude/Cowork:** delegate module scopes to the bundled `research-module` subagent and optionally use `evidence-auditor` after all memos exist.
+- **Claude/Cowork or WorkBuddy:** delegate module scopes to the bundled `research-module` subagent and optionally use `evidence-auditor` after all memos exist.
 - **Codex:** use native subagents with the same module and auditor contracts. Do not require users to install custom `.codex/agents` files.
 
-Let the host manage worker scheduling and concurrency. Each worker handles one scope and writes only `modules/<id>.md`; it must not write shared evidence or report files. If native subagents are unavailable, denied, lack research-tool access, or fail, run only the missing modules sequentially in the parent with the identical contract. Never replace host delegation with a spawned Claude, Codex, Pi, or model-API process.
+Let the host manage worker scheduling and concurrency. Each worker handles one scope and writes only `modules/<id>.md`; it must not write shared evidence or report files. If native subagents are unavailable, denied, lack research-tool access, or fail, run only the missing modules sequentially in the parent with the identical contract. Never replace host delegation with a spawned Claude, Codex, WorkBuddy, Pi, or model-API process.
 
 Read `references/multiagent-workflow.md` and `references/module-contract.md` before planning or dispatching workers.
 

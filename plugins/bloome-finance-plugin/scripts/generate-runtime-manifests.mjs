@@ -16,7 +16,7 @@ function validateConfig(value) {
   assert.ok(value.description?.trim(), "description is required");
   assert.ok(value.author?.name?.trim(), "author.name is required");
   assert.ok(value.repository?.startsWith("https://"), "repository must be an HTTPS URL");
-  assert.equal(value.components?.mcpServers, "./.mcp.json", "both hosts must share the root MCP declaration");
+  assert.equal(value.components?.mcpServers, "./.mcp.json", "all hosts must share the root MCP declaration");
   assert.ok(Array.isArray(value.codex?.defaultPrompt) && value.codex.defaultPrompt.length <= 3, "Codex supports at most three default prompts");
   for (const prompt of value.codex.defaultPrompt) assert.ok(prompt.length <= 128, "each Codex default prompt must be at most 128 characters");
 }
@@ -61,6 +61,15 @@ const claudeManifest = {
   mcpServers: config.components.mcpServers,
 };
 
+const workbuddyManifest = {
+  name: config.name,
+  version: config.version,
+  description: config.description,
+  author: config.author,
+  repository: config.repository,
+  keywords: [...config.keywords, "workbuddy"],
+};
+
 const codexMarketplace = {
   name: config.marketplace.name,
   interface: { displayName: config.marketplace.displayName },
@@ -89,11 +98,29 @@ const claudeMarketplace = {
   }],
 };
 
+const workbuddyMarketplace = {
+  name: config.marketplace.name,
+  displayName: config.marketplace.displayName,
+  description: "Bloome plugins for evidence-first investment research.",
+  version: config.version,
+  maintainer: config.author,
+  plugins: [{
+    name: config.name,
+    version: config.version,
+    source: `./plugins/${config.name}`,
+    description: config.description,
+    tags: [...config.keywords, "workbuddy"],
+    repository: config.repository,
+  }],
+};
+
 const outputs = new Map([
   [path.join(pluginRoot, ".codex-plugin", "plugin.json"), codexManifest],
   [path.join(pluginRoot, ".claude-plugin", "plugin.json"), claudeManifest],
+  [path.join(pluginRoot, ".workbuddy-plugin", "plugin.json"), workbuddyManifest],
   [path.join(repositoryRoot, ".agents", "plugins", "marketplace.json"), codexMarketplace],
   [path.join(repositoryRoot, ".claude-plugin", "marketplace.json"), claudeMarketplace],
+  [path.join(repositoryRoot, ".workbuddy-plugin", "marketplace.json"), workbuddyMarketplace],
 ]);
 
 for (const [target, value] of outputs) {
