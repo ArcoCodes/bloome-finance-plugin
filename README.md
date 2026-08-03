@@ -6,8 +6,6 @@
 
 ## Codex 安装
 
-当前仓库为 `ArcoCodes` 组织私有内测源。安装者需要先获得仓库访问权限，并在本机配置 GitHub 凭证。
-
 ```bash
 codex plugin marketplace add ArcoCodes/bloome-finance-plugin
 ```
@@ -33,27 +31,30 @@ claude --plugin-dir ./plugins/bloome-finance-plugin
 
 ## WorkBuddy 安装
 
-在 WorkBuddy 对话中添加当前私有 marketplace（需先配置 GitHub 仓库访问权限），然后安装插件：
+在 WorkBuddy 对话中依次输入：
 
 ```text
 /plugin marketplace add ArcoCodes/bloome-finance-plugin
 /plugin install bloome-finance-plugin@bloome-finance
+/reload-plugins
 ```
 
-本地开发可直接添加仓库中的 marketplace 文件：
+然后新建任务，直接描述投研需求，或用 `/investment-research-agent` 明确调用 Skill。
+
+本地开发可直接添加仓库目录：
 
 ```text
 /plugin marketplace add /absolute/path/to/bloome-finance-plugin --name bloome-finance
 /plugin install bloome-finance-plugin@bloome-finance
 ```
 
-安装或修改后执行 `/reload-plugins`，再新建任务。WorkBuddy 会加载同一套 Skills、Agents 和本地 MCP；完成报告通过返回的 `reportPath` 打开。
+WorkBuddy 会加载同一套 Skills、Agents 和本地 MCP；完成报告通过返回的 `reportPath` 打开。插件可在左侧 **专家·技能·连接器** 中管理。
 
 ## 账号与研究额度
 
 模型推理继续使用 Codex、Claude 或 WorkBuddy 的现有账号，不需要额外模型 Key。首次调用研究工具时，本地 MCP 会打开 Bloome Finance：用户通过 Google 或邮箱登录并授权当前设备，完成后工具自动继续，不需要复制长期 token，也不会把 MCP 改成远程服务。
 
-每个完成验证的账号终身赠送 5 次研报额度。新 research workspace 的首次数据请求会先在对话中显示研究主题、费用和当前余额；用户明确确认后才开始检索。普通聊天、拒绝确认、创建或打开本地 workspace 都不扣费。同一 run 内后续搜索和精确读取不重复扣费，成功执行 `validate_research_workspace` 后关闭 run。额度不足时可前往 Bloome Finance 购买 20 篇、50 篇或包年无限篇套餐；包年有效期内单次费用为 0。
+完成验证的新账号在 `hongrongyuan.bloome.im` 赠送 5 次研报额度，在 `finance.bloome.im` 赠送 1 次；已有账号余额不变。新 research workspace 的首次数据请求会先在对话中显示研究主题、费用和当前余额；用户明确确认后才开始检索。普通聊天、拒绝确认、创建或打开本地 workspace 都不扣费。同一 run 内后续搜索和精确读取不重复扣费，成功执行 `validate_research_workspace` 后关闭 run。额度不足时可前往 Bloome Finance 购买 20 篇、50 篇或包年无限篇套餐；包年有效期内单次费用为 0。
 
 本地开发可用 `BLOOME_FINANCE_URL` 指向另一套 Finance 服务。生产切换时必须撤销旧共享 beta token，并让上游研究数据服务只接受 Finance 后端持有的内部密钥。外部域名及变更结论见 [`docs/external-domains.md`](docs/external-domains.md)。
 
@@ -99,6 +100,6 @@ Codex 清单还应使用 `plugin-creator` 的 `validate_plugin.py` 检查。架�
 
 ## 分发边界
 
-- 当前阶段：同一私有 GitHub 仓库同时作为 Codex、Claude Code 与 WorkBuddy marketplace，适用于小规模邀请制内测。
+- 当前阶段：同一公开 GitHub 仓库同时作为 Codex、Claude Code 与 WorkBuddy marketplace。
 - 正式阶段：托管公网 MCP 服务、接入 Bloome 账号体系，并提交 Codex Plugins Directory 审核。
 - 插件只访问用户主动指定的研究工作区；报告文件保留在本地，并在验证成功后上传到用户私有的 Bloome Finance Storage。
