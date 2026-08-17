@@ -2,7 +2,7 @@
   "name": "bloome-finance",
   "displayName": "Bloome Finance",
   "description": "Bloome plugins for evidence-first investment research.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "maintainer": {
     "name": "Bloome",
     "url": "https://github.com/ArcoCodes"
@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "bloome-finance-plugin",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "source": "./plugins/bloome-finance-plugin",
       "description": "Cross-runtime, evidence-first investment research with traceable sources and a Bloome workbench.",
       "tags": [

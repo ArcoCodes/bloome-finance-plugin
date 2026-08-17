@@ -1,15 +1,42 @@
 {
   "name": "bloome-finance-plugin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
+  "type": "module",
+  "main": "dsh/host.mjs",
+  "exports": {
+    ".": "./dsh/host.mjs",
+    "./client": "./dist/dsh-client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ],
+      "platform": "web"
+    }
+  },
   "scripts": {
     "generate:manifests": "node scripts/generate-runtime-manifests.mjs",
     "check:manifests": "node scripts/generate-runtime-manifests.mjs --check",
+    "build:report": "esbuild src/report/render-report.jsx --bundle --minify --legal-comments=none --define:process.env.NODE_ENV='\"production\"' --platform=node --format=cjs --outfile=dist/render-report.cjs",
+    "build:dsh": "esbuild dsh/client.jsx --bundle --minify --platform=browser --format=cjs --external:@deepseek-ai/* --external:react --banner:js=\"window.__ModuleLoader__.load({id:'bloome-finance-plugin',factory:(require)=>{var module={exports:{}};var exports=module.exports;\" --footer:js=\"return module.exports;}});\" --outfile=dist/dsh-client.js",
+    "check:report": "node scripts/check-report-bundle.mjs",
     "test": "node --test test/*.test.mjs",
     "test:ui": "node test/ui.e2e.cjs",
-    "verify": "npm run check:manifests && npm test"
+    "verify": "npm run check:manifests && npm run check:report && npm run build:dsh && npm test"
   },
   "devDependencies": {
-    "playwright": "^1.58.0"
+    "esbuild": "^0.25.9",
+    "marked": "^16.2.1",
+    "playwright": "^1.58.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   }
 }

@@ -26,6 +26,6 @@ When `evidence_disposition.md` and `decision.md` exist, also check semantically:
 - each selected company, security, or proxy fairly represents the compared alternative;
 - the report and visuals preserve the same ranking, caveats, and falsifiers as `decision.md`.
 
-When visuals are planned, apply the `investment-visualization` skill's review logic to the rendered report. Judge the actual screenshot rather than inferring quality from markup.
+When visuals are planned, verify that every descriptive outline key maps to one `visuals.json` specification and one report marker, every visual evidence ID resolves to accepted evidence, and the rendered component preserves the same basis, uncertainty, and ranking as `decision.md`. Apply the `investment-visualization` skill's review logic to the rendered report. Judge the actual screenshot rather than inferring quality from the specification.
 
 Do not edit files or write report prose. Return a concise list of blocking findings, non-blocking gaps, and the affected artifact paths. The parent researcher owns reconciliation and every shared artifact.

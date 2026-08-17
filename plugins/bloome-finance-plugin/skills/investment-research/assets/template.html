@@ -6,7 +6,7 @@
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:'Georgia','Times New Roman',serif;background:#fff;color:#1A1A1A}
-  .report{max-width:680px;margin:0 auto;border:1px solid #E0DCD4}
+  .report{max-width:680px;margin:0 auto;border:1px solid #E0DCD4;overflow-x:clip}
   .top-bar{height:4px;background:linear-gradient(90deg,#003A5C,#B59A57)}
   .bottom-bar{height:3px;background:#003A5C}
   .header{padding:24px 28px 16px;border-bottom:1px solid #E0DCD4}
@@ -35,22 +35,22 @@
   .judge-label{font-size:11px;letter-spacing:1.5px;color:#B59A57;text-transform:uppercase;margin-bottom:8px;font-family:'Helvetica Neue',Arial,sans-serif}
   .confidence{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:6px 14px;background:#003A5C;color:#fff;border-radius:9999px;font-size:12px;font-family:'Helvetica Neue',Arial,sans-serif;font-weight:500}
   .confidence .dot{width:6px;height:6px;border-radius:50%;background:#B59A57}
-  .src{position:relative;color:#5A5A5A;font-size:12px;font-family:'Helvetica Neue',Arial,sans-serif;border-bottom:1px dashed #B59A57;cursor:help;white-space:nowrap}
+  .src{position:relative;color:#5A5A5A;font-size:12px;font-family:'Helvetica Neue',Arial,sans-serif;border-bottom:1px dashed #B59A57;cursor:help;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
   .src:hover{color:#003A5C;border-bottom-color:#003A5C}
-  .src .tip{display:none;position:absolute;top:calc(100% + 6px);left:0;width:min(560px,calc(100vw - 40px));max-height:min(280px,40vh);overflow-y:auto;overscroll-behavior:contain;padding:14px 18px;background:#003A5C;color:#fff;font-size:13px;line-height:1.7;border-radius:10px;z-index:100;white-space:pre-wrap;font-family:'Helvetica Neue',Arial,sans-serif;box-shadow:0 10px 36px rgba(0,0,0,.35);text-align:left}
+  .src .tip{display:none;position:fixed;top:0;left:0;width:min(480px,calc(100vw - 32px));max-height:min(240px,45vh);overflow:auto;overflow-wrap:anywhere;word-break:break-word;overscroll-behavior:contain;padding:14px 18px;background:#003A5C;color:#fff;font-size:13px;line-height:1.65;border-radius:10px;z-index:1000;white-space:pre-wrap;font-family:'Helvetica Neue',Arial,sans-serif;box-shadow:0 10px 36px rgba(0,0,0,.35);text-align:left}
   .src .tip .tip-hd{display:block;font-size:11px;font-weight:600;color:#B59A57;margin-bottom:8px}
   .src .tip .tip-bd{color:#fff}
-  .src .tip u{text-decoration:underline;text-underline-offset:2px}
+  .src .tip u{text-decoration:none}
   .src:hover .tip,.src:focus .tip{display:block}
   .src:hover::before,.src:focus::before{content:'';position:absolute;top:100%;left:0;width:100%;height:6px}
-  .primary-quote{margin:16px 0;padding:4px 0;color:#5A5A5A;font-size:13px;line-height:1.7;font-family:'Georgia','Times New Roman',serif}
-  .primary-quote cite{display:block;margin-top:7px;color:#5A5A5A;font-size:10px;font-style:normal;font-family:'Helvetica Neue',Arial,sans-serif}
+  .primary-quote{margin:18px 0;padding:14px 18px;background:#F7F5F0;border-left:3px solid #D8C9A3;border-radius:0 8px 8px 0;color:#2A2A2A;font-size:13px;line-height:1.75;font-family:'Georgia','Times New Roman',serif}
+  .primary-quote cite{display:block;margin-top:9px;color:#5A5A5A;font-size:10px;font-style:normal;font-family:'Helvetica Neue',Arial,sans-serif}
   .data-callout{display:flex;gap:12px;margin:12px 0}
   .data-card{flex:1;padding:10px 12px;background:#F7F5F0;border-radius:8px;text-align:center}
   .data-card .val{font-size:18px;font-weight:700;color:#003A5C;font-family:'Helvetica Neue',Arial,sans-serif}
   .data-card .lbl{font-size:10px;color:#5A5A5A;margin-top:3px;font-family:'Helvetica Neue',Arial,sans-serif}
   svg text{font-family:'Helvetica Neue',Arial,sans-serif}
-  @media(max-width:560px){.report{border-left:0;border-right:0}.header,.section,.source-bar{padding-left:18px;padding-right:18px}.chart-row,.data-callout{flex-direction:column}.src .tip{position:fixed;left:16px;right:16px;bottom:16px;top:auto;width:auto;max-height:50vh}}
+  @media(max-width:560px){.report{border-left:0;border-right:0}.header,.section,.source-bar{padding-left:18px;padding-right:18px}.chart-row,.data-callout{flex-direction:column}.src .tip{width:min(320px,calc(100vw - 24px));max-height:50vh}}
   @media print{.report{max-width:none;border:0}.src .tip{display:none!important}}
 </style>
 </head>
@@ -62,7 +62,7 @@
   <div class="header">
     <div class="header-label">Global Investment Research</div>
     <div class="header-title">【报告标题】</div>
-    <div class="header-meta">数据覆盖：专家及一手资料已读 {{primary_sources_read}} 篇 · 机构研究资料已读 {{sell_reports_read}} 篇 · 数据截至 {{report_month}}</div>
+    <div class="header-meta">数据覆盖：卖方机构研报已读 {{sell_reports_read}} 篇 · 产业资料已读 {{primary_sources_read}} 篇 · 数据截至 {{report_month}}</div>
   </div>
 
   <!-- 第一屏：研判 -->
@@ -78,10 +78,11 @@
   <div class="section">
     <div class="section-label">① 观点标题</div>
     <div class="analysis-text">
-      <p>分析内容，引用用 <span class="src" tabindex="0">〔机构·报告〕<span class="tip"><span class="tip-hd">研报原文 · 机构 · 报告</span><span class="tip-bd">完整原文段落——逐字抄录该论断所在的整个段落（而非一句话摘要），可含多段，段落间空一行；关键句用<u>下划线</u>。tooltip 已支持滚动，不必为长度截断原文</span></span></span>。</p>
+      <p>分析内容，引用用 <span class="src" tabindex="0">〔机构·报告〕<span class="tip"><span class="tip-hd">引用中译 · 机构 · 报告</span><span class="tip-bd">完整中文引文——若原文为外文，忠实翻译该论断所在的完整段落，保留所有数字、日期、限定条件与段落边界；不要摘要、截断或留下大段英文。正文保持纯文本</span></span></span>。</p>
     </div>
-    <!-- 专家及一手资料原话直接展示，不使用 hover tooltip -->
-    <blockquote class="primary-quote">“专家或一手资料原话……”<cite>来源：{{primary_quote_source}}</cite></blockquote>
+    <!-- 买方/产业纪要引文紧跟上方对应论述；同一论点可使用多条具有增量信息的独立引文；中文报告展示完整中译，原文留在 evidence.json 中溯源 -->
+    <blockquote class="primary-quote">“完整中文引文——原文为外文时忠实翻译全文，保留具体数字、时间、条件与因果，不删节、不用省略号。”<cite>来源：{{primary_quote_source}}</cite></blockquote>
+    <p>紧接引文解释它如何支持、限定或反驳上方判断，再进入下一个论点。</p>
     <!-- 图表插入位置：<div class="chart-row"><div class="chart-col">…SVG…</div></div> -->
   </div>
 
@@ -101,14 +102,17 @@
 <script>
 (function(){
   function place(s){
-    if(!window.matchMedia('(min-width:561px)').matches)return;
     var tip=s.querySelector('.tip');if(!tip)return;
     var r=s.getBoundingClientRect();
-    var col=(s.closest('.report')||document.body).getBoundingClientRect();
-    var w=Math.min(560,window.innerWidth-40);
-    var left=-Math.max(0,r.left+w-(col.right-20));
-    if(r.left+left<col.left+20)left=col.left+20-r.left;
-    tip.style.left=left+'px';
+    var pad=window.innerWidth<=560?12:16;
+    var w=Math.min(window.innerWidth<=560?320:480,window.innerWidth-pad*2);
+    tip.style.width=w+'px';
+    tip.style.left=Math.max(pad,Math.min(r.left,window.innerWidth-w-pad))+'px';
+    tip.style.top=(r.bottom+8)+'px';
+    requestAnimationFrame(function(){
+      var h=tip.getBoundingClientRect().height;
+      if(r.bottom+8+h>window.innerHeight-pad)tip.style.top=Math.max(pad,r.top-h-8)+'px';
+    });
   }
   document.addEventListener('mouseover',function(e){
     var s=e.target.closest?e.target.closest('.src'):null,a=document.activeElement;

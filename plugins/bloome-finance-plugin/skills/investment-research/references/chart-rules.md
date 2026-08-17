@@ -1,48 +1,38 @@
-# Chart rules
+# Chart Rules
 
-Use a chart only when visual structure helps the argument. A table is better for exact lookup; prose is better for one or two values.
+Use a visual only when structure helps the argument. A controlled table is better for exact lookup; prose is better for one or two values.
 
 ## Selection
 
-| Data structure | Presentation |
+| Evidence structure | `visuals.json` type |
 |---|---|
-| Time series | inline SVG line chart |
-| Discrete comparison | horizontal bars or columns |
-| Quantity plus growth | bars plus line, with both axes labeled |
-| Price/revenue/margin/EPS bridge | waterfall |
-| Bull/base/bear | grouped bars or range plot |
-| One-variable sensitivity | tornado |
-| Two-variable sensitivity | table/heatmap with printed values |
-| Share/market structure | sorted bars; doughnut only for a small complete whole |
-| Valuation methods/ranges | football/range plot |
-| Exact multi-metric comparison | table |
+| Time series or inflection | `line` |
+| One-period comparison or ranking | `bar` |
+| Composition across categories or periods | `stacked-bar` |
+| Signed bridge from drivers to earnings | `waterfall` |
+| Growth–valuation, probability–payoff, or risk–return plane | `scatter` |
+| Valuation, target-price, or scenario interval | `range` |
+| Causal transmission or process | `flow` |
+| Exact multi-metric comparison | `table` |
+| Two-variable sensitivity | `matrix` |
 
-Relationship rather than numeric data goes through `concept-diagrams.md`.
+Use only types defined in `visual-spec.md`. If a recurring evidence structure genuinely needs another form, add one reviewed React component and contract test; never improvise raw HTML/SVG in a report run.
 
-## Rendering
+## Data and editorial rules
 
-- Prefer the runtime's `reson-charts` widget for numeric data charts when it is available. Use its documented chart type and data schema, configure the report palette, and give every chart an explicit height. If it is unavailable, render an equivalent self-contained inline SVG/CSS chart; do not load remote assets or invent an API.
-- Keep every chart inside the template's existing visual system.
-- Every chart has a visible title, units, numeric anchors, source line, and accessible description (`role="img" aria-label="..."`).
-- Print important values directly. Do not rely on hover for the chart's meaning.
-- Use the report palette only. Distinguish series with labels, line styles, or patterns as well as color.
-- Never truncate labels or let secondary data obscure the main series.
-- The sentence before a chart must state the claim it supports; never write “the chart below shows”.
-- Arrows are SVG paths/symbols, never text glyphs such as `->` or `▶`.
-- Do not invent interpolation, missing periods, or proportions. If reliable scaling is awkward, use a table.
+- Every visual has a conclusion-led title, visible units or basis, accessible description, uncertainty where material, and exact accepted evidence IDs.
+- The sentence before `{{visual:key}}` states the claim the visual supports.
+- Observed, forecast, and scenario values remain distinguishable in labels and explanatory text.
+- Keep dates, forecast periods, currencies, fiscal/calendar years, and accounting definitions comparable.
+- Use a zero baseline for `bar` values.
+- Put the main series first in `line`; all series share one honest scale and label sequence.
+- Keep every `stacked-bar` segment on one absolute basis and in one label order; do not silently normalize totals.
+- Use `waterfall` only for additive signed bridges and mark from-zero totals explicitly.
+- Give `scatter` explicit numeric axes and direct point labels; do not imply correlation from a small sample.
+- Use `range` only when every item shares one basis.
+- Keep `flow` in one reading direction with few nodes and explicit gates.
+- Print every `matrix` value and mark the base row/column.
+- Never invent interpolation, missing periods, normalized scores, or proportions.
+- Do not rely on hover, remote assets, chart libraries, raw HTML, custom CSS, or JavaScript.
 
-## Widget Contract
-
-When the runtime provides `reson-charts`, use the following conceptual contract and read its own catalog/schema before calling it:
-
-```js
-ResonChart.configure({
-  brand: { blue: '#003A5C', orange: '#B59A57' },
-  palette: ['#003A5C', '#B59A57', '#5A5A5A', '#7A93A6', '#D4C089']
-});
-ResonChart.render('chart-id', { type, data, height: '300px', options });
-```
-
-Use `options.labels` to localize built-in labels and use `.chart-source` below the chart. Never mix an unlabelled widget with an unrelated legend or put the only source in a hover state.
-
-Recommended numeric chart types are `line`, `combo`, `waterfall`, `clustered`, `tornado`, `sensitivity`, `doughnut`, `mekko`, `treemap`, `football`, and `source-attribution`. Use the actual supported catalog rather than assuming every runtime supports every type.
+The controlled React renderer owns geometry, palette, typography, and mobile behavior. The `investment-visualization` skill owns selection, normalization, annotation text, uncertainty, sequence, and screenshot review.
