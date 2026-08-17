@@ -5,12 +5,14 @@ const path = require("node:path");
 const readline = require("node:readline");
 const { pathToFileURL } = require("node:url");
 const finance = require("./finance-client.cjs");
+const reportRenderer = require("../dist/render-report.cjs");
+const { resolvedCitations } = require("../scripts/citations.cjs");
 
 const ROOT = path.resolve(__dirname, "..");
 const PLUGIN_CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, "plugin.config.json"), "utf8"));
 const SERVER_NAME = "bloome-finance-plugin";
 const SERVER_VERSION = PLUGIN_CONFIG.version;
-const WIDGET_URI = `ui://widget/bloome-finance-${encodeURIComponent(SERVER_VERSION)}.html`;
+const WIDGET_URI = `ui://widget/bloome-research-${encodeURIComponent(SERVER_VERSION)}.html`;
 const WIDGET_MIME = "text/html;profile=mcp-app";
 const REQUIRED_FILES = [
   "sell_side_logic.md",
@@ -21,6 +23,7 @@ const REQUIRED_FILES = [
   "report.md",
   "report.html",
   "evidence.json",
+  "visuals.json",
   "coverage_stats.json",
 ];
 
@@ -70,13 +73,13 @@ function runtimeProfile(runtime = runtimeName()) {
     return {
       name: runtime,
       supportsWorkbench: false,
-      instructions: `Use ${host} as the reasoning runtime. Preserve the investment research workflow and assets/template.html report contract. Use the returned reportPath to inspect the finished HTML report. ${billing}`,
+      instructions: `Use ${host} as the reasoning runtime. Preserve the investment research workflow and render report.html with the bundled React static renderer. Use the returned reportPath to inspect the finished HTML report. ${billing}`,
     };
   }
   return {
     name: "codex",
     supportsWorkbench: true,
-    instructions: `Use Codex as the reasoning runtime. Preserve the investment research workflow and assets/template.html report contract. Bloome styling applies only to the workbench shell. ${billing}`,
+    instructions: `Use Codex as the reasoning runtime. Preserve the investment research workflow and render report.html with the bundled React static renderer. Bloome styling applies only to the workbench shell. ${billing}`,
   };
 }
 
@@ -103,7 +106,7 @@ function toolDefinitions(runtime = runtimeName()) {
     tool(
       "research_search",
       "Search investment research",
-      "Search the controlled professional research corpus. Expert and firsthand evidence has higher decision weight than institutional reports. Before the first retrieval call, tell the user that Bloome Finance may open in their browser for sign-in and device approval. A new workspace returns a quote without charging; stop, show its topic, returned cost, and balance, then call confirm_research_run only after explicit user approval. Later requests in the same active run do not charge again.",
+      "Search the controlled sell-side or primary research corpus. Keep sell and primary as separate calls. Primary results have no expert/official source label: search industry-expert and official material in separate primary calls using different concepts and phrases, not source_types. Expert search has priority and official results do not complete it. Before the first retrieval call, tell the user that Bloome Finance may open in their browser for sign-in and device approval. A new workspace returns a quote without charging; stop, show its topic, returned cost, and balance, then call confirm_research_run only after explicit user approval. Later requests in the same active run do not charge again.",
       objectSchema(SEARCH_PROPERTIES, ["workspace", "corpus"]),
       { openWorld: true, readOnly: false, idempotent: false },
     ),
@@ -160,11 +163,18 @@ function toolDefinitions(runtime = runtimeName()) {
       { widget: profile.supportsWorkbench },
     ),
     tool(
+      "render_research_report",
+      "Render static investment report",
+      "Synchronize final_report.md to report.md, then compile it with evidence.json, visuals.json, and coverage_stats.json through the bundled React server renderer into a self-contained report.html. The output preserves the native report style, includes no React browser runtime, and is ready for visual review and upload.",
+      objectSchema({ workspace: WORKSPACE_PROPERTY }, ["workspace"]),
+      { readOnly: false, destructive: false },
+    ),
+    tool(
       "validate_research_workspace",
-      "Validate investment report",
-      "Validate required staged files, evidence traceability, chapter substance, report completeness, and the native report template contract. Successful validation closes the active Bloome Finance run.",
-      objectSchema({ workspace: { type: "string", minLength: 1 } }, ["workspace"]),
-      { readOnly: false, destructive: true },
+      "Validate report and generate link",
+      "Validate evidence traceability, multiple independent visible primary passages, chapter substance, report completeness, planned visuals, and React-rendered static HTML. Successful validation generates and returns a directly accessible report link, then closes the active research run.",
+      objectSchema({ workspace: WORKSPACE_PROPERTY }, ["workspace"]),
+      { readOnly: false, destructive: false },
     ),
   ];
 }
@@ -256,15 +266,14 @@ function coverageErrors(coverage) {
   for (const corpus of ["sell", "primary"]) {
     if (!rounds.some((round) => round.corpus === corpus)) errors.push(`${corpus} retrieval must be represented in coverage_stats.json`);
   }
+  for (const sourceLayer of ["expert", "official"]) {
+    if (!rounds.some((round) => round.corpus === "primary" && round.source_layer === sourceLayer)) {
+      errors.push(`primary ${sourceLayer} retrieval must be a separate round in coverage_stats.json`);
+    }
+  }
   if (!String(coverage.stopping_reason || "").trim()) errors.push("coverage_stats.json requires a retrieval stopping_reason");
   if (!Array.isArray(coverage.remaining_gaps)) errors.push("coverage_stats.json requires a remaining_gaps array");
   return errors;
-}
-
-function citations(markdown) {
-  return [...markdown.matchAll(/(?:\[([^\]\n]+)\]|〔([^〕\n]+)〕|【([^】\n]+)】)/g)]
-    .map((match) => match[1] ?? match[2] ?? match[3])
-    .filter((value) => /,\s*(?:p{1,2}\.\d+(?:-\d+)?|lines? \d+(?:-\d+)?)/.test(value));
 }
 
 function bodyParagraphs(markdown) {
@@ -275,17 +284,29 @@ function bodyParagraphs(markdown) {
     .filter(Boolean);
 }
 
-function moduleErrors(id, markdown) {
+function moduleErrors(id, markdown, evidence) {
   const errors = [];
   if (!bodyParagraphs(markdown).length) errors.push(`module ${id} is title-only or lacks substantive evidence`);
-  if (!citations(markdown).length) errors.push(`module ${id} requires at least one exact source citation`);
+  if (!resolvedCitations(markdown, evidence).length) errors.push(`module ${id} requires at least one citation resolved to evidence.json`);
   return errors;
 }
 
-function chapterErrors(name, markdown) {
+function chapterErrors(name, markdown, evidence) {
   const errors = [];
   if (!bodyParagraphs(markdown).length) errors.push(`${name} is title-only or lacks substantive analysis`);
-  if (!citations(markdown).length) errors.push(`${name} requires at least one exact source citation`);
+  if (!resolvedCitations(markdown, evidence).length) errors.push(`${name} requires at least one citation resolved to evidence.json`);
+  return errors;
+}
+
+function chapterCoverageErrors(chapters, finalReport, evidence) {
+  const errors = [];
+  const finalEvidence = new Set(resolvedCitations(finalReport, evidence).map(({ item }) => item.chunk_id));
+  for (const { name, markdown } of chapters) {
+    const heading = markdown.match(/^#\s+(.+)$/m)?.[1]?.trim();
+    if (heading && !finalReport.includes(heading)) errors.push(`${name} heading is missing from final_report.md`);
+    const chapterEvidence = resolvedCitations(markdown, evidence).map(({ item }) => item.chunk_id);
+    if (chapterEvidence.length && !chapterEvidence.some((id) => finalEvidence.has(id))) errors.push(`${name} has no evidence represented in final_report.md`);
+  }
   return errors;
 }
 
@@ -300,6 +321,7 @@ async function validateWorkspace(workspace) {
   const chapters = chapterArtifacts.length;
   if (!chapters) errors.push("research workspace requires chapter drafts");
 
+  const evidence = readJson(path.join(root, "evidence.json"), []);
   const plan = readJson(path.join(root, "plan.json"), {});
   const modules = Array.isArray(plan.modules) ? plan.modules : [];
   if (!names.has("plan.json")) errors.push("missing plan.json");
@@ -309,26 +331,37 @@ async function validateWorkspace(workspace) {
     if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) { errors.push(`invalid module id: ${id || "missing"}`); continue; }
     const memo = readText(path.join(root, "modules", `${id}.md`));
     if (!memo) errors.push(`missing modules/${id}.md`);
-    else errors.push(...moduleErrors(id, memo));
+    else errors.push(...moduleErrors(id, memo, evidence));
   }
 
   const chapterFiles = chapterArtifacts.map(({ name }) => ({ name, markdown: readText(path.join(root, name)) }));
-  for (const chapter of chapterFiles) errors.push(...chapterErrors(chapter.name, chapter.markdown));
+  for (const chapter of chapterFiles) errors.push(...chapterErrors(chapter.name, chapter.markdown, evidence));
   const finalReport = readText(path.join(root, "final_report.md"));
+  errors.push(...chapterCoverageErrors(chapterFiles, finalReport, evidence));
 
-  const evidence = readJson(path.join(root, "evidence.json"), []);
+  const visuals = readJson(path.join(root, "visuals.json"), null);
+  const coverage = readJson(path.join(root, "coverage_stats.json"), {});
   const report = readText(path.join(root, "report.md"));
+  const inspection = reportRenderer.inspectReport(report, Array.isArray(evidence) ? evidence : []);
+  const chapterHeadings = new Set(chapterFiles.map(({ markdown }) => markdown.match(/^#\s+(.+)$/m)?.[1]?.trim()).filter(Boolean));
+  if (!inspection.hasTitle || chapterHeadings.has(inspection.title)) errors.push("report.md requires a distinct H1 report title before its first H1 section");
   if (report.replace(/\s+/g, " ").trim() !== finalReport.replace(/\s+/g, " ").trim()) {
     errors.push("report.md must match the synthesized final_report.md");
   }
   const html = readText(path.join(root, "report.html"));
+  try {
+    const template = readText(path.join(ROOT, "skills", "investment-research", "assets", "template.html"));
+    const expected = reportRenderer.renderReport({ markdown:report, evidence, coverage, visuals, template });
+    if (html.trim() !== expected.trim()) errors.push("report.html is stale; rerun render_research_report after changing report, evidence, visuals, coverage, or template inputs");
+  } catch (error) {
+    errors.push(`React report render failed: ${error.message}`);
+  }
   const sellSideLogic = readText(path.join(root, "sell_side_logic.md"));
   const validationMarkdown = readText(path.join(root, "validation.md"));
-  const coverage = readJson(path.join(root, "coverage_stats.json"), {});
   errors.push(...coverageErrors(coverage));
   let result;
   if (Array.isArray(evidence) && report && html) {
-    const validation = core.validateReport(report, html, evidence, { sellSideLogic, validation: validationMarkdown });
+    const validation = core.validateReport(report, evidence, inspection, { sellSideLogic, validation: validationMarkdown });
     errors.push(...validation.errors);
     result = { ok: errors.length === 0, workspace: root, errors: [...new Set(errors)], warnings: validation.warnings, artifacts, chapters };
   } else {
@@ -372,7 +405,7 @@ function resourceText() {
 function resources() {
   return [{
     uri: WIDGET_URI,
-    name: "bloome_finance_workbench",
+    name: "bloome_research_workbench",
     title: "Bloome Finance Research",
     description: "Native research workspace and investment report viewer.",
     mimeType: WIDGET_MIME,
@@ -393,6 +426,7 @@ async function callTool(name, args = {}, runtime = runtimeName(), options = {}) 
       workbenchAvailable: profile.supportsWorkbench,
     };
   }
+  if (name === "render_research_report") return reportRenderer.renderWorkspace(args.workspace, ROOT);
   if (name === "validate_research_workspace") return validateWorkspace(args.workspace);
   throw new Error(`unknown tool: ${name}`);
 }
@@ -428,7 +462,7 @@ async function handleRpc(message, runtime = runtimeName(), options = {}) {
       capabilities: profile.supportsWorkbench
         ? { tools: { listChanged: false }, resources: { subscribe: false, listChanged: false }, logging: {} }
         : { tools: { listChanged: false }, logging: {} },
-      serverInfo: { name: SERVER_NAME, title: "Bloome Investment Research", version: SERVER_VERSION },
+      serverInfo: { name: SERVER_NAME, title: "Bloome Finance Research", version: SERVER_VERSION },
       instructions: profile.instructions,
     });
     if (method === "ping") return rpcResponse(id, {});

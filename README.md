@@ -1,37 +1,49 @@
 # Bloome Finance Plugin
 
-面向 Codex、Claude Code 与腾讯 WorkBuddy 的专家优先金融投研插件。它把可追溯的投研工作流、受控研究数据接口和统一报告契约打包成同一份共享实现，并为三个宿主生成各自的插件清单和 marketplace。专家与一手资料的判断权重高于机构研究报告。
+Bloome Finance 是面向 Codex、Claude Code、腾讯 WorkBuddy 和 DeepSeek Harness 的专业金融投研插件。它帮助用户把一个公司、行业、主题或资产配置问题，推进为有计划、有证据、有判断、可复核的完整研究报告。
 
-宿主使用用户现有账号完成规划、推理和写作，不需要额外的模型 API Key。Investment Research Skill 自带的研报结构、引用规则与 HTML 模板保持为最终输出标准。Codex 还会渲染 Bloome PiP / fullscreen 工作台；Claude Code 和 WorkBuddy 返回同一工作区的进度、证据和 `reportPath`，直接读取最终报告，不假装支持 Codex 专属面板。
+插件使用宿主现有模型完成分析和写作，不需要额外的模型 API Key。
 
-## Codex 安装
+## 产品能力
+
+- **专家优先研究**：分别检索机构研究、行业专家和官方资料，用一手证据校准市场共识。
+- **结构化研究计划**：把复杂问题拆分为互不重叠的研究模块，明确每个模块要回答的问题、所需证据和反证条件。
+- **并行深度分析**：并行完成行业、需求、供给、竞争、财务、估值、风险和情景分析，再由主任务统一核对。
+- **可追溯判断**：重要结论、数字和引用均关联到具体来源、日期和原文位置。
+- **完整投资报告**：输出核心判断、证据链、关键数据、情景边界、反方证据、风险、监控指标和结论失效条件。
+- **受控图表与排版**：根据论证需要生成表格、图表和决策组件，形成可直接阅读的完整 HTML 报告。
+- **交付前验证**：自动检查研究覆盖、引用、章节深度、视觉内容和最终报告完整性。
+- **在线报告链接**：验证成功后生成可直接访问的报告链接，方便阅读和分享。
+
+## 支持平台
+
+| 平台 | 体验 |
+|---|---|
+| Codex | Bloome Research 工作台与完整报告预览 |
+| Claude Code | 原生插件、研究进度和报告文件 |
+| WorkBuddy | 原生 Skill、研究专家和报告交付 |
+| DeepSeek Harness | 实时研究面板、模块进度和原生确认 |
+
+## 安装
+
+### Codex
 
 ```bash
 codex plugin marketplace add ArcoCodes/bloome-finance-plugin
 ```
 
-随后在 Codex Desktop 的 **Plugins** 页面选择 **Bloome Research** 并安装 **Bloome Investment Research**。Codex CLI 用户也可以通过 `/plugins` 安装。安装后需要新建一个任务，插件的 skill 和 MCP tools 才会载入。
+随后在 Codex Desktop 的 **Plugins** 页面安装 **Bloome Investment Research**。Codex CLI 用户也可通过 `/plugins` 安装。安装后请新建任务。
 
-## Claude Code 安装
-
-同一仓库同时包含 Claude Code marketplace：
+### Claude Code
 
 ```bash
 claude plugin marketplace add ArcoCodes/bloome-finance-plugin
 claude plugin install bloome-finance-plugin@bloome-finance
 ```
 
-本地开发时可以跳过安装，直接运行：
+### WorkBuddy
 
-```bash
-claude --plugin-dir ./plugins/bloome-finance-plugin
-```
-
-修改插件组件后，在 Claude Code 中执行 `/reload-plugins`。
-
-## WorkBuddy 安装
-
-在 WorkBuddy 对话中依次输入：
+在 WorkBuddy 对话中输入：
 
 ```text
 /plugin marketplace add ArcoCodes/bloome-finance-plugin
@@ -39,67 +51,84 @@ claude --plugin-dir ./plugins/bloome-finance-plugin
 /reload-plugins
 ```
 
-然后新建任务，直接描述投研需求，或用 `/investment-research-agent` 明确调用 Skill。
+随后新建任务。也可以使用 `/investment-research-agent` 明确启动投研。
 
-本地开发可直接添加仓库目录：
+### DeepSeek Harness
 
-```text
-/plugin marketplace add /absolute/path/to/bloome-finance-plugin --name bloome-finance
-/plugin install bloome-finance-plugin@bloome-finance
+```bash
+dsh plugin --profile web add \
+  "github:ArcoCodes/bloome-finance-plugin#path:/plugins/bloome-finance-plugin"
 ```
 
-WorkBuddy 会加载同一套 Skills、Agents 和本地 MCP；完成报告通过返回的 `reportPath` 打开。插件可在左侧 **专家·技能·连接器** 中管理。
+重新启动 Web profile 后即可使用。
 
-## 账号与研究额度
+## 使用方式
 
-模型推理继续使用 Codex、Claude 或 WorkBuddy 的现有账号，不需要额外模型 Key。首次调用研究工具时，本地 MCP 会打开 Bloome Finance：用户通过 Google 或邮箱登录并授权当前设备，完成后工具自动继续，不需要复制长期 token，也不会把 MCP 改成远程服务。
-
-完成验证的新账号在 `hongrongyuan.bloome.im` 赠送 5 次研报额度，在 `finance.bloome.im` 赠送 1 次；已有账号余额不变。新 research workspace 的首次数据请求会先在对话中显示研究主题、费用和当前余额；用户明确确认后才开始检索。普通聊天、拒绝确认、创建或打开本地 workspace 都不扣费。同一 run 内后续搜索和精确读取不重复扣费，成功执行 `validate_research_workspace` 后关闭 run。额度不足时可前往 Bloome Finance 购买 20 篇、50 篇或包年无限篇套餐；包年有效期内单次费用为 0。
-
-本地开发可用 `BLOOME_FINANCE_URL` 指向另一套 Finance 服务。生产切换时必须撤销旧共享 beta token，并让上游研究数据服务只接受 Finance 后端持有的内部密钥。外部域名及变更结论见 [`docs/external-domains.md`](docs/external-domains.md)。
-
-## 使用
+直接描述研究目标，不需要记忆工具名或固定指令：
 
 ```text
 研究 AI 推理需求对 NAND 价格周期的影响，并生成完整研报。
-打开当前项目的 Bloome Research 工作台。
-验证当前研报是否满足全部输出要求。
+比较铜、黄金和原油在未来十二个月的投资机会。
+分析一家公司的需求、竞争格局、盈利弹性、估值和主要风险。
+研究 2026 年下半年黄金价格是否仍有上涨空间。
 ```
 
-研究产物保存在当前项目的 `.bloome/research/` 下，不应提交到业务仓库。验证成功后，`report.html` 也会发布到用户私有的 Bloome Finance 账户，并返回 `/reports/<id>` 网页地址。
+插件会依次完成：
 
-## 仓库结构
+1. 明确研究问题与范围；
+2. 检索机构、专家和官方资料；
+3. 建立模块化研究计划；
+4. 并行完成各模块分析；
+5. 统一核对证据、冲突和缺口；
+6. 形成判断、章节和图表；
+7. 验证并交付完整报告。
+
+## DeepSeek Harness 研究面板
+
+研究开始后，右侧面板会展示：
+
+- 当前研究阶段和总体进度；
+- Evidence、Artifacts 和 Chapters 数量；
+- 完整研究计划；
+- 每个模块的 pending、running 和 completed 状态；
+- 当前核心判断；
+- 最终报告位置。
+
+检索、并行研究、文件生成、报告渲染和验证过程中，面板会持续更新。关闭后可通过右侧 **B Research** 按钮重新打开；不同 Session 的面板彼此独立。
+
+## 登录与研究额度
+
+首次使用研究数据时，Bloome Finance 会引导用户登录和授权。研究任务会在开始前展示本次费用和当前余额，只有用户明确确认后才会开始；取消确认、普通聊天和打开已有研究均不会扣费。
+
+同一次研究中的后续检索不会重复扣费。额度不足时，可根据页面提示前往 Bloome Finance 补充额度。
+
+## 研究成果
+
+研究内容保存在当前项目的：
 
 ```text
-.agents/plugins/marketplace.json
-.claude-plugin/marketplace.json
-.workbuddy-plugin/marketplace.json
-plugins/bloome-finance-plugin/
-├── .codex-plugin/plugin.json
-├── .claude-plugin/plugin.json
-├── .workbuddy-plugin/plugin.json
-├── .mcp.json
-├── plugin.config.json
-├── skills/investment-research/
-├── mcp/server.cjs
-├── scripts/core.mjs
-└── assets/
+.bloome/research/<topic-slug>/
 ```
 
-## 本地验证
+其中包括研究计划、模块分析、证据、核心判断、报告大纲、章节、图表、验证结果和最终报告。建议不要将 `.bloome/research/` 提交到业务代码仓库。
+
+最终交付包括：
+
+- `report.html`：完整可视化报告；
+- `final_report.md`：最终报告正文；
+- `evidence.json`：可追溯证据；
+- `decision.md`：核心判断与决策依据；
+- 在线报告链接。
+
+## 本地开发
 
 ```bash
 cd plugins/bloome-finance-plugin
 npm ci
+npm run build:report
+npm run build:dsh
 npm run verify
 npm run test:ui
-claude plugin validate ../.. --strict
 ```
 
-Codex 清单还应使用 `plugin-creator` 的 `validate_plugin.py` 检查。架构边界和新增宿主流程见 [`docs/architecture.md`](docs/architecture.md)。
-
-## 分发边界
-
-- 当前阶段：同一公开 GitHub 仓库同时作为 Codex、Claude Code 与 WorkBuddy marketplace。
-- 正式阶段：托管公网 MCP 服务、接入 Bloome 账号体系，并提交 Codex Plugins Directory 审核。
-- 插件只访问用户主动指定的研究工作区；报告文件保留在本地，并在验证成功后上传到用户私有的 Bloome Finance Storage。
+详细架构见 [`docs/architecture.md`](docs/architecture.md)。

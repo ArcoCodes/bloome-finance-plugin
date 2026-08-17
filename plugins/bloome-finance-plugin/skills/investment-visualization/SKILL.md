@@ -1,13 +1,13 @@
 ---
 name: investment-visualization
-description: Designs, renders, and reviews editorial-grade evidence-led charts, diagrams, and decision graphics for investment reports. Use when an investment report needs high-end financial data journalism, annotated static HTML/SVG visuals, valuation or scenario graphics, supply-demand charts, company comparisons, or a visual-quality review.
+description: Designs and reviews editorial-grade evidence-led visual specifications rendered by controlled React report components. Use when an investment report needs financial data journalism, valuation or scenario graphics, supply-demand charts, company comparisons, mechanism diagrams, or a visual-quality review.
 ---
 
 # Investment Visualization
 
 Create original, evidence-led financial visuals with the clarity, restraint, annotation quality, and narrative sequencing expected from top-tier data journalism. Treat that as a quality bar, not a request to reproduce another publisher's brand, page, headline, or proprietary design.
 
-This skill owns visual judgment. Keep aesthetic and editorial logic here rather than encoding it as regex, HTML-class gates, or a large visualization schema.
+This skill owns visual judgment. The renderer contract defines only safe recurring geometry; keep selection, normalization, annotation, uncertainty, and editorial sequencing here rather than encoding those judgments as validator regex or CSS-class gates.
 
 ## Role in an investment report
 
@@ -16,10 +16,10 @@ Use this skill after the main research has reconciled evidence and formed a prov
 When working inside the Bloome plugin:
 
 - preserve `../investment-research/assets/template.html` as the single-page report shell;
-- insert visuals only within the report's existing content areas;
-- use the report palette and typography;
-- keep the result self-contained with static HTML, CSS, and inline SVG;
-- keep exact source links through `evidence.json` chunk IDs.
+- write safe component inputs to workspace `visuals.json` using `../investment-research/references/visual-spec.md`;
+- place each component in `report.md` with one descriptive `{{visual:key}}` marker;
+- use the report palette and typography through the renderer rather than custom CSS;
+- keep exact source links through accepted `evidence.json` IDs.
 
 Do not add a separate visualization dashboard or evidence tab.
 
@@ -101,20 +101,20 @@ Every graphic should have:
 
 Use color to focus attention, not to decorate or encode the only meaning. Keep comparison scales honest. Separate observed history from forecasts. Remove borders, legends, gridlines, and labels that do not help the reader.
 
-### 6. Render inside the report
+### 6. Specify and render inside the report
 
-Use static HTML/CSS/SVG. Do not load remote chart libraries or assets.
+Read `../investment-research/references/visual-spec.md`. Choose the narrowest supported component that honestly expresses the evidence: `bar`, `line`, `stacked-bar`, `waterfall`, `scatter`, `range`, `flow`, `table`, or `matrix`. If none fits, use prose rather than injecting custom HTML or inventing geometry during a report run.
 
-For every planned figure:
+For every planned visual:
 
-- retain its conclusion, role in the argument, and evidence chunk IDs without exposing internal visual IDs;
-- render meaningful text directly, without hover dependence;
-- use a responsive SVG `viewBox` or a responsive HTML table;
-- keep text readable at phone width;
-- allow annotations to reflow rather than shrinking the desktop composition;
-- place the conclusion in prose immediately before the figure.
+- use a descriptive key that states the argument rather than an opaque ID;
+- save the conclusion, accessible description, uncertainty, exact values, units, and accepted evidence IDs in `visuals.json`;
+- place one matching `{{visual:key}}` marker immediately after the prose that states its conclusion;
+- keep meaningful text and decisive values visible without hover dependence;
+- let the controlled React component own SVG/HTML geometry, report palette, and mobile reflow;
+- never write raw HTML, SVG, CSS, JavaScript, or event handlers.
 
-Use `references/editorial-grammar.md` for composition and `references/review.md` for acceptance.
+Call `render_research_report`, then use `references/editorial-grammar.md` for composition review and `references/review.md` for acceptance.
 
 ### 7. Review the rendered result
 
@@ -145,12 +145,14 @@ Revise until the answer is yes, or replace the graphic with a table or prose.
 
 ## Output boundary
 
-This skill may edit the report outline's visual notes and the visual portions of `report.html`. It does not rewrite the thesis, evidence ledger, decision record, or chapter conclusions.
+This skill may edit the report outline's visual notes, workspace `visuals.json`, and descriptive visual markers in `report.md`. It does not hand-edit `report.html` or rewrite the thesis, evidence ledger, decision record, or chapter conclusions.
 
-Keep planning and review notes as Markdown. Do not introduce a large JSON chart specification unless the user explicitly asks for one.
+Keep planning and review notes as Markdown. Keep `visuals.json` limited to renderer-supported data and labels; do not turn it into a layout language.
 
 ## References
 
 Read `references/editorial-grammar.md` before choosing chart forms or composing visuals.
 
 Read `references/review.md` before final delivery.
+
+Read `../investment-research/references/visual-spec.md` before writing `visuals.json`.

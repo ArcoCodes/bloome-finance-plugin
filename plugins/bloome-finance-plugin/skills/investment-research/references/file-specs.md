@@ -74,6 +74,8 @@ Use outline text as a blueprint, not draft prose.
 
 ## `final_report.md`
 
+Begin with one reader-facing H1 report title. The first substantive section, normally the core judgment, follows as the next H1.
+
 Recommended structure:
 
 1. Executive summary
@@ -88,15 +90,17 @@ Recommended structure:
 
 Default citation policy:
 
-- Use `primary` expert and firsthand evidence as the main basis for qualitative judgments.
-- Use `sell` for supporting frameworks and structured data.
-- Render expert and firsthand quotations as visible `<blockquote class="primary-quote">` blocks. Replace `{{primary_quote_source}}` with a source label built from the matched evidence entry's source party/title and `published_at`; keep page/line locators in `evidence.json` for traceability, not in the visible source line. Do not use generic or invented source labels. Keep institutional-research citations in the template's `.src` hover tooltip.
-- Fill each `.src` tooltip body with the full original passage from the matched evidence entry's `quote` — the complete paragraph(s) containing the cited statement, verbatim, with key sentences underlined. A one-sentence summary is not acceptable; the tooltip exists so readers can read the original text, and it scrolls when long.
+- Use `sell` for framework and structured data.
+- Use `primary` for reader-facing quoted passages and qualitative proof.
+- Write primary quotations as ordinary Markdown blockquotes and end the same blockquote with `来源：<exact source party/title> · <published_at>`. The React renderer emits visible `.primary-quote` components. Keep page/line locators in `evidence.json` for traceability, not in the visible source line. Do not use generic or invented source labels. Write inline evidence references as `{{cite:<evidence-id>}}`, using the exact `id` or `chunk_id` from `evidence.json`. The renderer replaces the marker with the standard reader-facing title and page/line locator and creates the `.src` tooltip. Exact legacy bracket citations remain supported, but do not abbreviate them to institution-and-date labels such as `[J.P. Morgan, 2026-07-02]`. Expert evidence is the highest-priority reader-facing layer: show multiple independent expert passages, and for every core industry claim with accepted expert support or challenge evidence, show at least one matched passage. One isolated quotation, one extracted sentence, or a source-bar entry is invalid; show the complete paragraph or paragraphs.
+- Match quotations to the report language. In a Chinese-language report, a non-Chinese evidence passage must have a complete, faithful Chinese translation in `quote_zh`. Fill each `.src` tooltip and visible `primary-quote` block with `quote_zh`; use `quote` directly only when the source passage is already Chinese. Preserve all sentences, figures, dates, qualifiers, and paragraph boundaries. Never summarize, abridge, drop clauses, or replace interior text with an ellipsis (`……`/`...`). Keep tooltip text plain, without underlines or `<u>` markup.
+- Preserve the complete source-language passage verbatim in `quote` even when the report displays `quote_zh`. This separates audit evidence from reader-facing localization: validation checks the complete display field selected for the report, while traceability continues to use the untouched original.
+- Keep argument and evidence adjacent. Put each `primary-quote` directly after the reader-facing paragraph, list item, or table interpretation that introduces its claim, then continue with the implication or calibration. Allow as many independent, non-redundant quotations as the same claim genuinely needs. Do not relocate decision-relevant evidence away from its argument merely to collect quotations elsewhere. Every displayed quotation must already exist as accepted evidence in `evidence.json`; never invent evidence for presentation.
 - Allow charts, tables, and quantitative analysis to use `sell` data extensively.
-- Calibrate key `sell` figures with expert or firsthand `primary` evidence where possible.
-- Do not let uncalibrated `sell` data override stronger expert evidence or silently function as validated fact.
+- Calibrate key `sell` figures with `primary` where possible.
+- Do not let uncalibrated `sell` data silently function as validated fact.
 
-The final report should include a source coverage section that summarizes:
+The final report should include a reader-facing source coverage section. Describe source categories naturally; do not expose internal fields such as `corpus`, `chunk_id`, or `report_id`. Summarize:
 
 - retrieval rounds and query directions used
 - total `sell` reports retrieved, deduplicated, read, and cited
@@ -107,6 +111,12 @@ The final report should include a source coverage section that summarizes:
 
 ## Supporting Files
 
+### `visuals.json`
+
+The outline declares each visual once as `Planned visual: <descriptive-key> — ...`; the component type exists only here.
+
+Store every planned figure or visual table as a controlled component specification using `visual-spec.md`. The file is always present and uses `{ "visuals": [] }` when no visual is useful. Every visual key appears exactly once as a standalone `{{visual:key}}` marker in `report.md`, and every `evidence_ids` entry resolves to an accepted `evidence.json` `id` or `chunk_id`. Never store raw HTML, SVG, CSS, or JavaScript.
+
 ### `coverage_stats.json`
 
 Record search breadth and the evidence-saturation judgment. Required fields:
@@ -115,6 +125,8 @@ Record search breadth and the evidence-saturation judgment. Required fields:
 - `query_seeds`
 - `stopping_reason`
 - `remaining_gaps`
+
+Each `retrieval_rounds` entry records `corpus`. Primary retrieval must contain separate entries with `source_layer: "expert"` and `source_layer: "official"`; this field records the query intent because primary search results do not carry that source label. One primary call cannot represent both.
 
 Useful descriptive fields, without minimum quotas:
 
@@ -159,15 +171,21 @@ Required fields include:
 - `corpus`
 - `chunk_id`
 - `report_id`
-- `quote`: the full original paragraph(s) containing the claim, copied verbatim from the source chunk — not a trimmed sentence. This field feeds the reader-facing `.src` tooltips, so it must be long enough to read as original text on its own.
-- `source_type`
+- `quote`: the full original-language paragraph(s) containing the claim, copied verbatim from the source chunk — not a trimmed sentence and not an ellipsis-shortened summary. Keep every sentence, number, date, and qualifier around the cited statement. This is the audit record and must never be replaced by a translation.
+- `quote_zh`: required when the report is Chinese and `quote` is not Chinese. Store a complete, faithful Chinese translation of the entire `quote`, preserving all paragraphs, figures, dates, qualifiers, and uncertainty. This is the reader-facing text for sell-side tooltips, primary quote blocks, and the workbench ledger. Omit it when `quote` is already Chinese.
 - `title`
 - `source_path`
 - `published_at`
 - `page_start` or `line_start`
 
+Preserve `source_type` only when the source actually returns one; never invent a source classification.
+
 Add `origin_id` when known so repeated reporting of the same underlying source is not treated as independent corroboration.
+
+## `report.md`
+
+Treat `report.md` as a generated mirror of `final_report.md`. Do not maintain it separately; `render_research_report` overwrites it atomically before rendering.
 
 ## `report.html`
 
-Treat `report.html` as the complete reader-facing report rendered with `assets/template.html`. Keep it single-page and self-contained. Do not add a second evidence tab or embed the audit artifacts in the HTML; those remain as Markdown and JSON files in the research workspace.
+Treat `report.html` as the complete reader-facing report compiled by `render_research_report`. The bundled React server renderer reads `assets/template.html`, parses Markdown tokens, renders `visuals.json` through controlled components, emits a single-page self-contained document, and includes no browser React runtime. Do not hand-write the page shell, add a second evidence tab, or embed audit artifacts in the HTML; those remain as Markdown and JSON files in the research workspace.
